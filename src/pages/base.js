@@ -5,7 +5,14 @@ const base=function (obj) {
       })
     }
     obj.hideLoading=(text)=>{
-      wx.hideLoading();
+      wx.showLoading();
+    }
+    obj.showToast=()=>{
+      wx.showToast({
+        title: '成功',
+        icon: 'success',
+        duration: 2000
+      })
     }
 
 
