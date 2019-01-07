@@ -107,7 +107,10 @@ class Index extends Component {
     })
 
   }
-
+  toWallet()
+  {
+    Taro.navigateTo({url:"/pages/my/wallet"})
+  }
   componentDidHide() {
   }
 
@@ -143,11 +146,12 @@ class Index extends Component {
 
           {/***头部轮播***/}
           <View>
-            <Swiper autoplay={true} circular={true} indicatorDots={true} style={{background: "#000000", height: "58vw"}}>
+            <Swiper autoplay={true} circular={true} indicatorDots={true}
+                    style={{background: "#000000", height: "58vw"}}>
               {
                 this.state.sild.map((item, i) => {
                   return (<SwiperItem key={i}>
-                    <Image src={item} style={{ width: "100vw"}} mode="widthFix"></Image>
+                    <Image src={item} style={{width: "100vw"}} mode="widthFix"></Image>
                   </SwiperItem>)
                 })
               }
@@ -158,13 +162,13 @@ class Index extends Component {
           <View style={{
             height: "80rpx",
             padding: "0rpx 10rpx 0rpx 10rpx",
-            backgroundImage: `url(${require('../../asset/images/carbk.png')})`,
+            backgroundImage: `url(${require('../../assets/images/carbk.png')})`,
             backgroundSize: "cover",
             display: "flex",
             alignItems: "center",
             flexDirection: "row"
           }}>
-            <Image src={require("../../asset/images/user.png")} style={{width: "30rpx", height: "30rpx"}}/>
+            <Image src={require("../../assets/images/user.png")} style={{width: "30rpx", height: "30rpx"}}/>
             {this.props.userinfo && <Image src={this.props.userinfo.userinfo.avatarUrl} style={{
               width: "50rpx",
               marginLeft: "20rpx",
@@ -185,7 +189,7 @@ class Index extends Component {
               flexDirection: "column"
             }}>
 
-              <Image src={require("../../asset/images/menu/menu3.png")}
+              <Image src={require("../../assets/images/menu/menu3.png")}
                      style={{maxWidth: "100rpx", maxHeight: "100rpx"}} mode="widthFix"/>
               <Text style={{fontSize: "24rpx", fontWeight: "bold", color: "#333333", marginTop: "10rpx"}}>
                 实卡兑换
@@ -205,9 +209,9 @@ class Index extends Component {
               alignItems: "center",
               justifyContent: "center",
               flexDirection: "column"
-            }}>
+            }} onClick={this.toWallet.bind(this)}>
 
-              <Image src={require("../../asset/images/menu/menu2.png")}
+              <Image src={require("../../assets/images/menu/menu2.png")}
                      style={{maxWidth: "100rpx", maxHeight: "100rpx"}} mode="widthFix"/>
               <Text style={{fontSize: "26rpx", fontWeight: "bold", color: "#333333", marginTop: "10rpx"}}>
                 我的钱包
@@ -228,7 +232,7 @@ class Index extends Component {
               justifyContent: "center",
               flexDirection: "column"
             }}>
-              <Image src={require("../../asset/images/menu/menu1.png")}
+              <Image src={require("../../assets/images/menu/menu1.png")}
                      style={{maxWidth: "100rpx", maxHeight: "100rpx"}} mode="widthFix"/>
               <Text style={{fontSize: "24rpx", fontWeight: "bold", color: "#333333", marginTop: "10rpx"}}>
                 我的洗车卡
@@ -246,7 +250,7 @@ class Index extends Component {
               justifyContent: "center",
               flexDirection: "column"
             }}>
-              <Image src={require("../../asset/images/menu/menu4.png")}
+              <Image src={require("../../assets/images/menu/menu4.png")}
                      style={{maxWidth: "100rpx", maxHeight: "100rpx"}} mode="widthFix"/>
               <Text style={{fontSize: "24rpx", fontWeight: "bold", color: "#333333", marginTop: "10rpx"}}>
                 我的消费
@@ -263,33 +267,33 @@ class Index extends Component {
           <View style={{
             height: "80rpx",
             padding: "0rpx 10rpx 0rpx 10rpx",
-            backgroundImage: `url(${require('../../asset/images/carbk.png')})`,
+            backgroundImage: `url(${require('../../assets/images/carbk.png')})`,
             backgroundSize: "cover",
             display: "flex",
             alignItems: "center",
             flexDirection: "row"
           }}>
-            <Image src={require("../../asset/images/VIP.png")} style={{width: "30rpx", height: "30rpx"}}/>
+            <Image src={require("../../assets/images/VIP.png")} style={{width: "30rpx", height: "30rpx"}}/>
             <Text style={{fontSize: "24rpx", marginLeft: "20rpx", color: "#333333"}}>
               亨亨会员
             </Text>
           </View>
-          <View style={{display:"flex",height:"280rpx",justifyContent:"space-between"}}>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15209562411192.png" style={{margin:"20rpx 10rpx 20rpx 20rpx",background:"#cccccc",flex:1,borderRadius:"10rpx"}} mode="widthFix">
+          <View style={{display: "flex", height: "280rpx", justifyContent: "space-between"}}>
+            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15209562411192.png"
+                   style={{margin: "20rpx 10rpx 20rpx 20rpx", background: "#cccccc", flex: 1, borderRadius: "10rpx"}}
+                   mode="widthFix">
 
 
             </Image>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15209521742126.png" style={{margin:"20rpx 20rpx 20rpx 10rpx",background:"#cccccc",flex:1,borderRadius:"10rpx"}} mode="widthFix">
+            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15209521742126.png"
+                   style={{margin: "20rpx 20rpx 20rpx 10rpx", background: "#cccccc", flex: 1, borderRadius: "10rpx"}}
+                   mode="widthFix">
 
 
             </Image>
-
-
 
 
           </View>
-
-
 
 
         </ScrollView>

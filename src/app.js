@@ -2,12 +2,13 @@ import '@tarojs/async-await'
 import Taro, { Component } from '@tarojs/taro'
 import { Provider } from '@tarojs/redux'
 
-import Index from './pages/index'
+import Index from './store/index'
 
 import configStore from './store'
 
 import './app.less'
-
+import 'taro-ui/dist/style/mixins/index.scss'
+import "./icon.scss"
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
 // if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
@@ -21,8 +22,19 @@ class App extends Component {
   config = {
     pages: [
       'pages/index/index',
+      'pages/index/workerdetail',
       'pages/store/index',
-      'pages/my/index'
+      'pages/my/index',
+      'pages/my/wallet',
+      'pages/my/recharge',
+      'pages/my/account',
+      'pages/my/transfer',
+      'pages/my/washcard',
+      'pages/my/sendcard',
+      'pages/my/carduse',
+      'pages/my/otoorder',
+      'pages/my/otodetail',
+      'pages/my/comment'
     ],
     window: {
       navigationBarBackgroundColor: '#fff',
@@ -38,23 +50,23 @@ class App extends Component {
       selectedColor: "#cc0033",
       borderStyle: "black" ,
       list: [{
-        selectedIconPath: "asset/images/home_selected.png",
-        iconPath: "asset/images/home.png",
-        pagePath: "pages/my/index",
+        selectedIconPath: "assets/images/home_selected.png",
+        iconPath: "assets/images/home.png",
+        pagePath: "pages/index/index",
         text: "首页"
       }, {
-        selectedIconPath: "asset/images/store_selected.png",
-        iconPath: "asset/images/store.png",
+        selectedIconPath: "assets/images/store_selected.png",
+        iconPath: "assets/images/store.png",
         pagePath: "pages/store/index",
         text: "门店"
       },{
-        selectedIconPath: "asset/images/my_selected.png",
-        iconPath: "asset/images/my.png",
-        pagePath: "pages/index/index",
+        selectedIconPath: "assets/images/my_selected.png",
+        iconPath: "assets/images/my.png",
+        pagePath: "pages/my/index",
         text: "我的"
       }
       ]
-    }
+    },
   }
 
   componentDidMount () {}
