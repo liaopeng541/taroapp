@@ -3,19 +3,19 @@ import {View, Button, Text, Swiper, SwiperItem, Image, ScrollView} from '@tarojs
 import {connect} from '@tarojs/redux'
 import {
   set_userinfo, set_cart, set_goodslist, set_viplist, set_bind_car_num, set_progress,
-  set_pushdata, set_pushdatanum, gohome_btn, set_cart_num,
+  set_pushdata, set_pushdatanum, gohome_btn, set_cart_num,set_store
 } from '../../actions/IndexAction'
-// import base from "../base"
+ import base from "../base"
 import request from "../../libs/request"
 import './index.less'
 import set from "../../apis/api"
 
 class Index extends Component {
   constructor(props) {
-    // base(this)
     super(props)
+    base(this)
     this.state = {
-      sild: []
+      isRefreshing: false,
     }
   }
 
@@ -40,23 +40,17 @@ class Index extends Component {
   }
 
   componentDidShow() {
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
+    wx.showLoading();
+    this.wx_request(set.storelist).then((res)=>{
+        this.props.dispatch(set_store(res.data.data))
+        wx.hideLoading();
+    }).catch((e)=>{
+      wx.hideLoading();
+      wx.showToast({title:"网络访问失败，请重试",icon:"none"})
     })
-    wx.getUserInfo({
-      success(res) {
-        const userInfo = res.userInfo
-        const nickName = userInfo.nickName
-        const avatarUrl = userInfo.avatarUrl
-        const gender = userInfo.gender // 性别 0：未知、1：男、2：女
-        const province = userInfo.province
-        const city = userInfo.city
-        const country = userInfo.country
-        console.log(res)
-      }
-    })
+
+
+
   }
 
   fetchData() {
@@ -98,6 +92,13 @@ class Index extends Component {
   }
 
   componentDidHide() {
+
+  }
+  todetail(id)
+  {
+    Taro.navigateTo({
+      url:"/pages/store/storedetail?id="+id
+    })
   }
 
   render() {
@@ -121,303 +122,46 @@ class Index extends Component {
         <ScrollView
         >
 
+          {
+            this.props.store.store&&this.props.store.store.map((item,i)=>{
+              console.log(item)
+              return(<View onClick={this.todetail.bind(this,item.id)} key={i} style={{borderBottom: "20rpx solid #f0f2f5"}}>
+                <Image src={set.upurl+item.thumb} style={{width: "100%"}}
+                       mode="widthFix"/>
+                <View>
 
-          <View style={{borderBottom: "20rpx solid #f0f2f5"}}>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15195542905500.jpg" style={{width: "100%"}}
-                   mode="widthFix"/>
-            <View>
-              <View style={{display: "flex", padding: "10rpx"}}>
-                <Text style={{fontSize: "30rpx", color: "#333333"}}>乾州亨亨旗舰店</Text>
-                <View
-                  style={{flex: 1, display: "flex", flexWrap: "wrap", marginLeft: "20rpx", justifyContent: "flex-end"}}>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>洗车</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>美容</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>钣喷</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>保养</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>维修</Text>
-                  </View>
+                  <View style={{display: "flex", padding: "10rpx"}}>
+                    <Text style={{fontSize: "30rpx", color: "#333333"}}>{item.name}</Text>
+                    <View
+                      style={{flex: 1, display: "flex", flexWrap: "wrap", marginLeft: "20rpx", justifyContent: "flex-end"}}>
+                      {item.store_label&&item.store_label.map((label,k)=>{
+                          return(<View key={k}
+                            style={{
+                              border: "solid 2rpx #cccccc",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              margin: "5rpx",
+                              padding: "5rpx 10rpx 5rpx 10rpx",
+                              borderRadius: "5rpx"
+                            }}>
+                            <Text style={{fontSize: "20rpx", color: "#cc0033"}}>{label}</Text>
+                          </View>)
+                      })}
+                    </View>
 
+                  </View>
+                </View>
+                <View style={{display: "flex", alignItems: "center", padding: "5rpx 10rpx 5rpx 10rpx"}}>
+                  <Image src={require("../../assets/images/location.png")} style={{width: "32rpx", height: "32rpx"}}/>
+                  <Text style={{color: "#999999", fontSize: "26rpx"}}>{item.address}</Text>
                 </View>
 
-              </View>
-            </View>
-            <View style={{display: "flex", alignItems: "center", padding: "5rpx 10rpx 5rpx 10rpx"}}>
-              <Image src={require("../../assets/images/location.png")} style={{width: "32rpx", height: "32rpx"}}/>
-              <Text style={{color: "#999999", fontSize: "26rpx"}}>吉首市人民南路乾州州法院旁</Text>
-            </View>
+              </View>)
+            })
+          }
 
-          </View>
-          <View style={{borderBottom: "20rpx solid #f0f2f5"}}>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15195542905500.jpg" style={{width: "100%"}}
-                   mode="widthFix"/>
-            <View>
-              <View style={{display: "flex", padding: "10rpx"}}>
-                <Text style={{fontSize: "30rpx", color: "#333333"}}>乾州亨亨旗舰店</Text>
-                <View
-                  style={{flex: 1, display: "flex", flexWrap: "wrap", marginLeft: "20rpx", justifyContent: "flex-end"}}>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>洗车</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>美容</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>钣喷</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>保养</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>维修</Text>
-                  </View>
 
-                </View>
-
-              </View>
-            </View>
-            <View style={{display: "flex", alignItems: "center", padding: "5rpx 10rpx 5rpx 10rpx"}}>
-              <Image src={require("../../assets/images/location.png")} style={{width: "32rpx", height: "32rpx"}}/>
-              <Text style={{color: "#999999", fontSize: "26rpx"}}>吉首市人民南路乾州州法院旁</Text>
-            </View>
-
-          </View>
-          <View style={{borderBottom: "20rpx solid #f0f2f5"}}>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15195542905500.jpg" style={{width: "100%"}}
-                   mode="widthFix"/>
-            <View>
-              <View style={{display: "flex", padding: "10rpx"}}>
-                <Text style={{fontSize: "30rpx", color: "#333333"}}>乾州亨亨旗舰店</Text>
-                <View
-                  style={{flex: 1, display: "flex", flexWrap: "wrap", marginLeft: "20rpx", justifyContent: "flex-end"}}>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>洗车</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>美容</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>钣喷</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>保养</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>维修</Text>
-                  </View>
-
-                </View>
-
-              </View>
-            </View>
-            <View style={{display: "flex", alignItems: "center", padding: "5rpx 10rpx 5rpx 10rpx"}}>
-              <Image src={require("../../assets/images/location.png")} style={{width: "32rpx", height: "32rpx"}}/>
-              <Text style={{color: "#999999", fontSize: "26rpx"}}>吉首市人民南路乾州州法院旁</Text>
-            </View>
-
-          </View>
-          <View style={{borderBottom: "20rpx solid #f0f2f5"}}>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15195542905500.jpg" style={{width: "100%"}}
-                   mode="widthFix"/>
-            <View>
-              <View style={{display: "flex", padding: "10rpx"}}>
-                <Text style={{fontSize: "30rpx", color: "#333333"}}>乾州亨亨旗舰店</Text>
-                <View
-                  style={{flex: 1, display: "flex", flexWrap: "wrap", marginLeft: "20rpx", justifyContent: "flex-end"}}>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>洗车</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>美容</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>钣喷</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>保养</Text>
-                  </View>
-                  <View style={{
-                    border: "solid 2rpx #cccccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "5rpx",
-                    padding: "5rpx 10rpx 5rpx 10rpx",
-                    borderRadius: "5rpx"
-                  }}>
-                    <Text style={{fontSize: "20rpx", color: "#cc0033"}}>维修</Text>
-                  </View>
-
-                </View>
-
-              </View>
-            </View>
-            <View style={{display: "flex", alignItems: "center", padding: "5rpx 10rpx 5rpx 10rpx"}}>
-              <Image src={require("../../assets/images/location.png")} style={{width: "32rpx", height: "32rpx"}}/>
-              <Text style={{color: "#999999", fontSize: "26rpx"}}>吉首市人民南路乾州州法院旁</Text>
-            </View>
-
-          </View>
         </ScrollView>
       </View>
     )
@@ -432,7 +176,8 @@ const mapstate = state => {
     goodslist: state.goodslist,
     vip: state.vip,
     progress: state.progress,
-    pushdata: state.pushdata
+    pushdata: state.pushdata,
+    store:state.store
   }
 }
 export default connect(mapstate)(Index)

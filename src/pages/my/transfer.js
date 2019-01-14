@@ -38,25 +38,13 @@ class Transfer extends Component {
 
   componentWillUnmount() {
   }
-
+  back()
+  {
+    Taro.navigateBack()
+  }
   componentDidShow() {
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
-    })
-    wx.getUserInfo({
-      success(res) {
-        const userInfo = res.userInfo
-        const nickName = userInfo.nickName
-        const avatarUrl = userInfo.avatarUrl
-        const gender = userInfo.gender // 性别 0：未知、1：男、2：女
-        const province = userInfo.province
-        const city = userInfo.city
-        const country = userInfo.country
-        console.log(res)
-      }
-    })
+
+
   }
 
   fetchData() {
@@ -117,7 +105,7 @@ class Transfer extends Component {
           right:"0rpx",
           zIndex:99
         }}>
-          <View style={{height:"80rpx",width:"70rpx",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <View onClick={this.back.bind(this)} style={{height:"80rpx",width:"70rpx",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
             <Image src={require("../../assets/images/left.png")} style={{width:"50rpx",height:"50rpx"}}/>
           </View>
           <View style={{flex:1,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>

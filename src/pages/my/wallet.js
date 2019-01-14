@@ -38,25 +38,13 @@ class Wallet extends Component {
 
   componentWillUnmount() {
   }
-
+  back()
+  {
+    Taro.navigateBack()
+  }
   componentDidShow() {
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
-    })
-    wx.getUserInfo({
-      success(res) {
-        const userInfo = res.userInfo
-        const nickName = userInfo.nickName
-        const avatarUrl = userInfo.avatarUrl
-        const gender = userInfo.gender // 性别 0：未知、1：男、2：女
-        const province = userInfo.province
-        const city = userInfo.city
-        const country = userInfo.country
-        console.log(res)
-      }
-    })
+
+
   }
 
   fetchData() {
@@ -96,7 +84,24 @@ class Wallet extends Component {
     })
 
   }
-
+  totransfer()
+  {
+    Taro.navigateTo({
+      url:"/pages/my/transfer"
+    })
+  }
+  toaccount()
+  {
+    Taro.navigateTo({
+      url:"/pages/my/account"
+    })
+  }
+  torechange()
+  {
+    Taro.navigateTo({
+      url:"/pages/my/recharge"
+    })
+  }
   componentDidHide() {
   }
 
@@ -117,7 +122,7 @@ class Wallet extends Component {
           right:"0rpx",
           zIndex:99
         }}>
-          <View style={{height:"80rpx",width:"70rpx",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <View onClick={this.back.bind(this)} style={{height:"80rpx",width:"70rpx",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
             <Image src={require("../../assets/images/left.png")} style={{width:"50rpx",height:"50rpx"}}/>
           </View>
           <View style={{flex:1,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
@@ -148,7 +153,8 @@ class Wallet extends Component {
 
 
           </View>
-          <View style={{display:"flex",alignItems:"center",height:"130rpx",borderBottom:"solid 2rpx #f0f2f5",justifyContent:"space-between"}}>
+          <View onClick={this.torechange.bind(this)}
+            style={{display:"flex",alignItems:"center",height:"130rpx",borderBottom:"solid 2rpx #f0f2f5",justifyContent:"space-between"}}>
             <View style={{width:"140rpx",height:"130rpx",alignItems:"center",justifyContent:"center",display:"flex"}}>
               <View style={{display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"40rpx",height:"80rpx",width:"80rpx",backgroundColor:"#6890ff"}}>
                 <Image src={require("../../assets/images/washcard.png")} style={{width: "40rpx", height: "40rpx"}}/>
@@ -173,7 +179,7 @@ class Wallet extends Component {
                 <Image src={require("../../assets/images/washcard.png")} style={{width: "40rpx", height: "40rpx"}}/>
               </View>
             </View>
-            <View style={{flex:1}}>
+            <View onClick={this.totransfer.bind(this)}  style={{flex:1}}>
               <Text style={{display:"block",color:"#333333",fontSize:"26rpx",fontWeight:"bold"}}>
                 转账
               </Text>
@@ -192,7 +198,7 @@ class Wallet extends Component {
                 <Image src={require("../../assets/images/washcard.png")} style={{width: "40rpx", height: "40rpx"}}/>
               </View>
             </View>
-            <View style={{flex:1}}>
+            <View onClick={this.toaccount.bind(this)} style={{flex:1}}>
               <Text style={{display:"block",color:"#333333",fontSize:"26rpx",fontWeight:"bold"}}>
                 交易记录
               </Text>

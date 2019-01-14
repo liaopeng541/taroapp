@@ -1,5 +1,5 @@
 import { combineReducers} from 'redux'
-import {usermodel,cart_num,cart,goodslist,vip,car,progress,pushdata,gohome_btn} from "./IndexModel"
+import {usermodel,cart_num,cart,goodslist,vip,car,progress,pushdata,gohome_btn,wxusermodel,store} from "./IndexModel"
 
 const rootreducer= combineReducers({
   usermodel, //把所有的reducer添加进来
@@ -10,6 +10,8 @@ const rootreducer= combineReducers({
   car,
   progress,
   pushdata,
-  gohome_btn
+  gohome_btn,
+  wxusermodel,
+  store
 })
 export default rootreducer

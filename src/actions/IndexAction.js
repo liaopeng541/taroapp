@@ -3,6 +3,10 @@
  */
 export const get_userinfo=()=>{return{type:"get_userinfo"}}
 export const set_userinfo=(userinfo)=>{return{type:"set_userinfo",userinfo:userinfo}}
+export const get_wxuser=()=>{return{type:"get_wxuser"}}
+export const set_wxuser=(wxuser)=>{return{type:"set_wxuser",wxuser:wxuser}}
+export const get_store=()=>{return{type:"get_store"}}
+export const set_store=(store)=>{return{type:"set_store",store:store}}
 export const get_token=()=>{return{type:"get_token"}}
 export const set_token=(token)=>{return{type:"set_token",token:token}}
 export const get_device_token=()=>{return{type:"get_device_token"}}

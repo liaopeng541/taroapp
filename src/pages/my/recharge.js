@@ -15,7 +15,15 @@ class Recharge extends Component {
     // base(this)
     super(props)
     this.state = {
-      sild: []
+      moneylist: [
+        {money: 99, checked: false},
+        {money: 299, checked: false},
+        {money: 599, checked: false},
+        {money: 999, checked: false},
+        {money: 1999, checked: false},
+        {money: 2999, checked: false},
+
+      ],
     }
   }
 
@@ -38,62 +46,12 @@ class Recharge extends Component {
 
   componentWillUnmount() {
   }
-
-  componentDidShow() {
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
-    })
-    wx.getUserInfo({
-      success(res) {
-        const userInfo = res.userInfo
-        const nickName = userInfo.nickName
-        const avatarUrl = userInfo.avatarUrl
-        const gender = userInfo.gender // 性别 0：未知、1：男、2：女
-        const province = userInfo.province
-        const city = userInfo.city
-        const country = userInfo.country
-        console.log(res)
-      }
-    })
+  back()
+  {
+    Taro.navigateBack()
   }
+  componentDidShow() {
 
-  fetchData() {
-    wx.showLoading({title: "加载中"})
-    var databody = {
-      token: this.token,
-      device_token: this.device_token
-    }
-    request.post(set.home, databody).then((data) => {
-      this.setState({
-        pagedata: data.data
-      })
-      this.props.dispatch(set_goodslist(data.data.goods))
-      if (data.data.user) {
-        this.props.dispatch(set_userinfo(data.data.user));
-      }
-      if (data.data.vip) {
-        this.props.dispatch(set_viplist(data.data.vip))
-      }
-      this.props.dispatch(set_cart_num(data.data.cart_num))
-      this.props.dispatch(set_pushdatanum(data.data.pushnum));
-      this.props.dispatch(set_bind_car_num(data.data.max_bind_car_num))
-
-      this.setState({
-        offers_goods: data.data.offers_goods
-      })
-
-      wx.hideLoading();
-      this.props.dispatch(set_progress(this.props.progress.progress + 1))
-    }).catch((err) => {
-      wx.hideLoading();
-      wx.showToast({
-        title: '网络访问失败，请重试',
-        icon: 'none',
-        duration: 2000
-      })
-    })
 
   }
 
@@ -117,7 +75,7 @@ class Recharge extends Component {
           right:"0rpx",
           zIndex:99
         }}>
-          <View style={{height:"80rpx",width:"70rpx",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <View onClick={this.back.bind(this)} style={{height:"80rpx",width:"70rpx",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
             <Image src={require("../../assets/images/left.png")} style={{width:"50rpx",height:"50rpx"}}/>
           </View>
           <View style={{flex:1,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
@@ -136,7 +94,7 @@ class Recharge extends Component {
                   1597***2691
                 </Text>
                 <Text style={{display:"block",color:"#999999",fontSize:"20rpx"}}>
-                  亨亨会员
+
                 </Text>
               </View>
             </View>
@@ -158,101 +116,35 @@ class Recharge extends Component {
 
               </View>
             <View style={{display:"flex",flexWrap:"wrap"}}>
-              <View style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
-                <Text style={{color:"#cc0033",fontSize:"30rpx"}}>99元</Text>
-              </View>
-              <View style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
-                <Text style={{color:"#cc0033",fontSize:"30rpx"}}>99元</Text>
-              </View>
-              <View style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
-                <Text style={{color:"#cc0033",fontSize:"30rpx"}}>99元</Text>
-              </View>
-              <View style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
-                <Text style={{color:"#cc0033",fontSize:"30rpx"}}>99元</Text>
-              </View>
-              <View style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
-                <Text style={{color:"#cc0033",fontSize:"30rpx"}}>99元</Text>
-              </View>
-              <View style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
-                <Text style={{color:"#cc0033",fontSize:"30rpx"}}>99元</Text>
-              </View>
-
-
-
+              {this.state.moneylist&&this.state.moneylist.map((item,i)=>{
+                return(<View key={i} style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
+                  <Text style={{color:"#cc0033",fontSize:"30rpx"}}>{item.money}元</Text>
+                </View>)
+              })}
             </View>
-
-
-
-
-
           </View>
 
           <View style={{padding:"20rpx",borderBottom:"10rpx solid #f0f2f5",display:"flex",flexDirection:"column"}}>
             <View style={{borderBottom:"2rpx solid #f0f2f5"}}>
               <Text style={{fontSize:"26rpx",color:"#333333"}}>充值说明</Text>
             </View>
-            <View style={{padding:"20rpx"}}>
-              <View style={{borderBottom:"1px solid #f0f2f5",display:"flex",padding:"10rpx"}}>
-                <View style={{width:"150rpx"}}>
+            {this.props.vip.viplist&&this.props.vip.viplist.map((item,i)=>{
+              return(item.list_show==1&&<View key={i} style={{padding:"20rpx"}}>
+                <View style={{borderBottom:"1px solid #f0f2f5",display:"flex",padding:"10rpx"}}>
+                  <View style={{width:"150rpx"}}>
+                    <Image src={set.upurl+item.thumb} style={{width:"150rpx"}} mode="widthFix"/>
+
+                  </View>
+                  <View style={{flex:1,display:"flex",alignItems:"center",paddingLeft:"20rpx"}}>
+                    <Text style={{color:"#333333",fontSize:"26rpx"}}>
+                      {item.level_desc}
+                    </Text>
+
+                  </View>
 
                 </View>
-                <View style={{flex:1,display:"flex",alignItems:"center"}}>
-                  <Text style={{color:"#333333",fontSize:"26rpx"}}>
-                    充值99到598元成为哼哼会员。快洗价11元每次，首次充值送3次快洗服务
-                  </Text>
-
-                </View>
-
-              </View>
-            </View>
-            <View style={{padding:"20rpx"}}>
-              <View style={{borderBottom:"1px solid #f0f2f5",display:"flex",padding:"10rpx"}}>
-                <View style={{width:"150rpx"}}>
-
-                </View>
-                <View style={{flex:1,display:"flex",alignItems:"center"}}>
-                  <Text style={{color:"#333333",fontSize:"26rpx"}}>
-                    充值99到598元成为哼哼会员。快洗价11元每次，首次充值送3次快洗服务
-                  </Text>
-
-                </View>
-
-              </View>
-            </View>
-            <View style={{padding:"20rpx"}}>
-              <View style={{borderBottom:"1px solid #f0f2f5",display:"flex",padding:"10rpx"}}>
-                <View style={{width:"150rpx"}}>
-
-                </View>
-                <View style={{flex:1,display:"flex",alignItems:"center"}}>
-                  <Text style={{color:"#333333",fontSize:"26rpx"}}>
-                    充值99到598元成为哼哼会员。快洗价11元每次，首次充值送3次快洗服务
-                  </Text>
-
-                </View>
-
-              </View>
-            </View>
-            <View style={{padding:"20rpx"}}>
-              <View style={{borderBottom:"1px solid #f0f2f5",display:"flex",padding:"10rpx"}}>
-                <View style={{width:"150rpx"}}>
-
-                </View>
-                <View style={{flex:1,display:"flex",alignItems:"center"}}>
-                  <Text style={{color:"#333333",fontSize:"26rpx"}}>
-                    充值99到598元成为哼哼会员。快洗价11元每次，首次充值送3次快洗服务
-                  </Text>
-
-                </View>
-
-              </View>
-            </View>
-
-
-
-
-
-
+              </View>)
+            })}
 
 
 
@@ -264,6 +156,9 @@ class Recharge extends Component {
 
 
         </ScrollView>
+        </View>
+        <View style={{position:"fixed",bottom:0,left:0,right:0,height:"90rpx",backgroundColor:"#cc0033",zIndex:99,alignItems:"center",justifyContent:"center",display:"flex"}}>
+          <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即充值</Text>
         </View>
       </View>
     )

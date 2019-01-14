@@ -27,7 +27,10 @@ class Workerdetail extends Component {
   onReachBottom() {
     console.log("bbbbb");
   }
-
+  back()
+  {
+    Taro.navigateBack()
+  }
   componentWillReceiveProps(nextProps) {
     console.log(this.props, nextProps)
   }
@@ -40,23 +43,8 @@ class Workerdetail extends Component {
   }
 
   componentDidShow() {
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
-    })
-    wx.getUserInfo({
-      success(res) {
-        const userInfo = res.userInfo
-        const nickName = userInfo.nickName
-        const avatarUrl = userInfo.avatarUrl
-        const gender = userInfo.gender // 性别 0：未知、1：男、2：女
-        const province = userInfo.province
-        const city = userInfo.city
-        const country = userInfo.country
-        console.log(res)
-      }
-    })
+
+
   }
 
   fetchData() {

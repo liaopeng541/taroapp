@@ -24,7 +24,10 @@ class Comment extends Component {
     navigationBarTitleText: '门店',
     enablePullDownRefresh: true,
   }
-
+  back()
+  {
+    Taro.navigateBack()
+  }
   onReachBottom() {
     console.log("bbbbb");
   }
@@ -41,23 +44,8 @@ class Comment extends Component {
   }
 
   componentDidShow() {
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
-    })
-    wx.getUserInfo({
-      success(res) {
-        const userInfo = res.userInfo
-        const nickName = userInfo.nickName
-        const avatarUrl = userInfo.avatarUrl
-        const gender = userInfo.gender // 性别 0：未知、1：男、2：女
-        const province = userInfo.province
-        const city = userInfo.city
-        const country = userInfo.country
-        console.log(res)
-      }
-    })
+
+
   }
 
   fetchData() {

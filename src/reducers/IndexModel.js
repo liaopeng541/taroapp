@@ -8,6 +8,20 @@ export const usermodel=(state={userinfo:null},action)=>{
         default:return state
     }
 }
+export const wxusermodel=(state={wxuser:null},action)=>{
+  switch (action.type)
+  {
+    case "set_wxuser":return {wxuser:action.wxuser};
+    default:return state
+  }
+}
+export const store=(state={store:null},action)=>{
+  switch (action.type)
+  {
+    case "set_store":return {store:action.store};
+    default:return state
+  }
+}
 export const cart_num=(state={cart_num:0},action)=>{
     switch (action.type)
     {

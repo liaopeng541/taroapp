@@ -1,26 +1,24 @@
 import Taro, {Component} from '@tarojs/taro'
-import {View, Button, Text, Swiper, SwiperItem, Image, ScrollView} from '@tarojs/components'
+import {View, Button, Text, Swiper, SwiperItem, Image, ScrollView,} from '@tarojs/components'
 import {connect} from '@tarojs/redux'
+import {AtModal, AtModalHeader, AtModalContent, AtModalAction,AtButton} from "taro-ui"
 import {
   set_userinfo, set_cart, set_goodslist, set_viplist, set_bind_car_num, set_progress,
-  set_pushdata, set_pushdatanum, gohome_btn, set_cart_num,
+  set_pushdata, set_pushdatanum, gohome_btn, set_cart_num, set_wxuser
 } from '../../actions/IndexAction'
-// import base from "../base"
 import request from "../../libs/request"
 import './index.less'
 import set from "../../apis/api"
-
+import "./css/index.css"
+import base from "../base"
 class Index extends Component {
   constructor(props) {
-    // base(this)
     super(props)
+    base(this)
     this.state = {
-      sild: [
-        'http://app.jzdzsw.cn/backend/web/uploads/15175626017756.jpg',
-        'http://app.jzdzsw.cn/backend/web/uploads/15175626446609.jpg',
-        'http://app.jzdzsw.cn/backend/web/uploads/15209522543075.jpg'
-      ],
-      title_opac: 0
+      sild: [],
+      title_opac: 0,
+      wxerror: false
     }
   }
 
@@ -47,19 +45,46 @@ class Index extends Component {
   componentWillUnmount() {
   }
 
+  getCatch() {
+    wx.removeStorageSync("wxuser");
+    wx.removeStorageSync("userinfo");
+
+    var wxuser = wx.getStorageSync("wxuser");
+    if (wxuser) {
+      this.wxuser = JSON.parse(wxuser);
+      this.props.dispatch(set_wxuser(this.wxuser))
+    }
+    var userinfo = wx.getStorageSync("userinfo");
+    if (userinfo) {
+      this.userinfo = JSON.parse(userinfo)
+      this.props.dispatch(set_userinfo(this.userinfo))
+    }
+  }
+
   componentDidShow() {
-    this.title_opac = 0;
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
+    this.getwxuser().then((res) => {
+      this.fetchData()
+    });
+  }
+
+  fetchData() {
+    wx.showLoading({title: "加载中..."})
+    var databody = {
+      device_token: this.props.wxuser.wxuser.openid
+    }
+    this.wx_request(set.home, databody, "POST").then((res) => {
+      this.setState({
+        sild: res.data.data.sild
+      })
+      this.props.dispatch(set_viplist(res.data.data.vip))
+      wx.hideLoading();
     })
-    var that = this;
-    wx.getUserInfo({
-      success(res) {
-        that.props.dispatch(set_userinfo(res.userInfo))
-      }
-    })
+
+
+  }
+
+  test() {
+    console.log(this.props.vip.viplist)
   }
 
   onPageScroll(e) {
@@ -70,50 +95,54 @@ class Index extends Component {
     })
   }
 
-  fetchData() {
-    wx.showLoading({title: "加载中"})
-    var databody = {
-      token: this.token,
-      device_token: this.device_token
-    }
-    request.post(set.home, databody).then((data) => {
-      this.setState({
-        pagedata: data.data
-      })
-      this.props.dispatch(set_goodslist(data.data.goods))
-      if (data.data.user) {
-        this.props.dispatch(set_userinfo(data.data.user));
-      }
-      if (data.data.vip) {
-        this.props.dispatch(set_viplist(data.data.vip))
-      }
-      this.props.dispatch(set_cart_num(data.data.cart_num))
-      this.props.dispatch(set_pushdatanum(data.data.pushnum));
-      this.props.dispatch(set_bind_car_num(data.data.max_bind_car_num))
 
-      this.setState({
-        offers_goods: data.data.offers_goods
-      })
+  tootoorder() {
+    Taro.navigateTo({url: "/pages/my/otoorder"})
+  }
 
-      wx.hideLoading();
-      this.props.dispatch(set_progress(this.props.progress.progress + 1))
-    }).catch((err) => {
-      wx.hideLoading();
-      wx.showToast({
-        title: '网络访问失败，请重试',
-        icon: 'none',
-        duration: 2000
-      })
+  towashcard() {
+    Taro.navigateTo({url: "/pages/my/washcard"})
+  }
+
+  toWallet() {
+    this.checkLogin.then(()=>{
+      Taro.navigateTo({url: "/pages/my/wallet"})
+    }).catch(()=>{
+      Taro.navigateTo({url: "/pages/my/login"})
     })
 
   }
-  toWallet()
-  {
-    Taro.navigateTo({url:"/pages/my/wallet"})
-  }
+
   componentDidHide() {
   }
+  tologin(val)
+  {
+    wx.showLoading({title:"加载中..",mask:true})
 
+    if(val.detail.userInfo)
+    {
+
+      var wxuser=Object.assign({},this.props.wxuser.wxuser,val.detail.userInfo,val.detail);
+      console.log(wxuser)
+      wx.hideLoading();
+      this.props.dispatch(set_wxuser(wxuser))
+      wx.setStorageSync("wxuser",JSON.stringify(wxuser));
+
+      setTimeout(()=>{
+        wx.hideLoading();
+        Taro.navigateTo({
+          url:"/pages/my/login"
+        })
+      },200)
+
+
+    }
+
+  }
+  tovipdetail(id)
+  {
+    Taro.navigateTo({url:"/pages/index/vip?id="+id})
+  }
   render() {
     return (
       <View>
@@ -147,11 +176,12 @@ class Index extends Component {
           {/***头部轮播***/}
           <View>
             <Swiper autoplay={true} circular={true} indicatorDots={true}
-                    style={{background: "#000000", height: "58vw"}}>
+                    style={{background: "#ffffff", height: "58vw"}}>
               {
+
                 this.state.sild.map((item, i) => {
                   return (<SwiperItem key={i}>
-                    <Image src={item} style={{width: "100vw"}} mode="widthFix"></Image>
+                    <Image src={set.upurl + item.image} style={{width: "100vw"}} mode="widthFix"></Image>
                   </SwiperItem>)
                 })
               }
@@ -162,25 +192,54 @@ class Index extends Component {
           <View style={{
             height: "80rpx",
             padding: "0rpx 10rpx 0rpx 10rpx",
-            backgroundImage: `url(${require('../../assets/images/carbk.png')})`,
+            backgroundImage: `url('../../assets/images/carbk.png')`,
             backgroundSize: "cover",
             display: "flex",
             alignItems: "center",
-            flexDirection: "row"
+            flexDirection: "row",
           }}>
-            <Image src={require("../../assets/images/user.png")} style={{width: "30rpx", height: "30rpx"}}/>
-            {this.props.userinfo && <Image src={this.props.userinfo.userinfo.avatarUrl} style={{
-              width: "50rpx",
-              marginLeft: "20rpx",
-              height: "50rpx",
-              borderRadius: "25rpx"
-            }}/>}
-            <Text style={{fontSize: "26rpx", marginLeft: "20rpx", color: "#666666"}}>
-              {this.props.userinfo && this.props.userinfo.userinfo.nickName}
-            </Text>
+            <View style={{height: "100%", display: "flex", alignItems: "center",flex:1}}>
+              <Image src={require("../../assets/images/user.png")} style={{width: "30rpx", height: "30rpx"}}/>
+              {this.props.userinfo.userinfo?<View style={{height: "100%", display: "flex", alignItems: "center", flex: 1,justifyContent:"space-between"}}>
+                <View style={{height: "100%", display: "flex", alignItems: "center",flex:1}}>
+                <Image
+                  src={this.props.userinfo && this.props.userinfo.userinfo ? this.props.wxuser.wxuser.avatarUrl : require("../../assets/images/avatar.png")}
+                  style={{
+                    width: "50rpx",
+                    marginLeft: "20rpx",
+                    height: "50rpx",
+                    borderRadius: "25rpx"
+                  }}/>
+                <Text style={{fontSize: "26rpx", marginLeft: "20rpx", color: "#666666"}}>
+                  {this.props.userinfo && this.props.userinfo.userinfo && this.props.wxuser.wxuser.nickName}
+                </Text>
+                </View>
+                <View style={{height: "100%", display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
+                  <Image
+                    src={this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.car ? set.upurl + this.props.userinfo.userinfo.car.logo : require("../../assets/images/avatar.png")}
+                    style={{
+                      width: "50rpx",
+                      marginLeft: "20rpx",
+                      height: "50rpx",
+                      borderRadius: "25rpx"
+                    }}/>
+                  <Text style={{fontSize: "26rpx", fontWeight: "bold", marginLeft: "20rpx", color: "#666666"}}>
+                    {this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.car.car_plate}
+                  </Text>
+                </View>
+              </View>:
+                <View style={{height: "100%", display: "flex", alignItems: "center",flex:1,marginLeft:"20rpx"}}>
+                  <View style={{height:"60rpx"}}>
+                  <AtButton   open-type="getUserInfo" size='small'  onGetUserInfo={this.tologin.bind(this)}>
+                      <Text  style={{color:"#cc0033",fontSize:"23rpx"}}>请登陆</Text>
+                  </AtButton >
+                  </View>
+                </View>}
+            </View>
+
           </View>
           <View style={{padding: "20rpx 0rpx 20rpx 0rpx", display: "flex", height: "150rpx"}}>
-            <View style={{
+            <View onClick={this.test.bind(this)} style={{
               flex: 1,
               borderRight: "solid 1px #f0f2f5",
               display: "flex",
@@ -224,14 +283,16 @@ class Index extends Component {
 
 
             </View>
-            <View style={{
-              flex: 1,
-              borderRight: "solid 1px #f0f2f5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column"
-            }}>
+            <View
+              onClick={this.towashcard.bind(this)}
+              style={{
+                flex: 1,
+                borderRight: "solid 1px #f0f2f5",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column"
+              }}>
               <Image src={require("../../assets/images/menu/menu1.png")}
                      style={{maxWidth: "100rpx", maxHeight: "100rpx"}} mode="widthFix"/>
               <Text style={{fontSize: "24rpx", fontWeight: "bold", color: "#333333", marginTop: "10rpx"}}>
@@ -243,7 +304,7 @@ class Index extends Component {
 
 
             </View>
-            <View style={{
+            <View onClick={this.tootoorder.bind(this)} style={{
               flex: 1,
               display: "flex",
               alignItems: "center",
@@ -279,28 +340,46 @@ class Index extends Component {
             </Text>
           </View>
           <View style={{display: "flex", height: "280rpx", justifyContent: "space-between"}}>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15209562411192.png"
-                   style={{margin: "20rpx 10rpx 20rpx 20rpx", background: "#cccccc", flex: 1, borderRadius: "10rpx"}}
-                   mode="widthFix">
+            {
+              this.props.vip.viplist && this.props.vip.viplist.length > 0 && this.props.vip.viplist.map((item, i) => {
+                return (parseInt(item.is_show) == 1 && <Image onClick={this.tovipdetail.bind(this,item.level_id)} src={set.upurl + item.thumb} key={i}
+                                                              style={{
+                                                                margin: "10rpx",
+                                                                background: "#cccccc",
+                                                                flex: 1,
+                                                                borderRadius: "10rpx"
+                                                              }}
+                                                              mode={"widthFix"}
+                />)
 
-
-            </Image>
-            <Image src="http://app.jzdzsw.cn/backend/web/uploads/15209521742126.png"
-                   style={{margin: "20rpx 20rpx 20rpx 10rpx", background: "#cccccc", flex: 1, borderRadius: "10rpx"}}
-                   mode="widthFix">
-
-
-            </Image>
+              })
+            }
+            {/*{this.props.vip.viplist && this.props.vip.viplist.length>0 && this.props.vip.viplist.map((item,i)=>{*/}
+            {/*if(item.is_show==1)*/}
+            {/*{*/}
+            {/*return(<Image src={set.upurl+item.thumb} key={i}*/}
+            {/*style={{margin: "20rpx 10rpx 20rpx 20rpx", background: "#cccccc", flex: 1, borderRadius: "10rpx"}}*/}
+            {/*mode="widthFix"></Image>)*/}
+            {/*}*/}
+            {/*})}*/}
 
 
           </View>
 
 
         </ScrollView>
+        <AtModal isOpened={this.state.wxerror}>
+          <AtModalHeader>温馨提示</AtModalHeader>
+          <AtModalContent>
+            网络不稳定，获取微信信息失败，请点击重试
+          </AtModalContent>
+          <AtModalAction><Button onClick={this.getwxuser.bind(this)}>重试</Button></AtModalAction>
+        </AtModal>
       </View>
     )
   }
 }
+
 
 const mapstate = state => {
   return {
@@ -310,7 +389,8 @@ const mapstate = state => {
     goodslist: state.goodslist,
     vip: state.vip,
     progress: state.progress,
-    pushdata: state.pushdata
+    pushdata: state.pushdata,
+    wxuser: state.wxusermodel
   }
 }
 export default connect(mapstate)(Index)
