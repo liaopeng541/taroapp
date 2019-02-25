@@ -5,81 +5,103 @@ import {
   set_userinfo, set_cart, set_goodslist, set_viplist, set_bind_car_num, set_progress,
   set_pushdata, set_pushdatanum, gohome_btn, set_cart_num,
 } from '../../actions/IndexAction'
-// import base from "../base"
+import base from "../base"
 import request from "../../libs/request"
 import './index.less'
 import set from "../../apis/api"
-
+let cacheResults = {
+  page: 0,
+  total: 0,
+  items: []
+}
 class Otoorder extends Component {
   constructor(props) {
-    // base(this)
+
     super(props)
+    base(this)
     this.state = {
-      sild: []
+      list: [],
+      total:-1
     }
   }
 
   config = {
-    navigationBarTitleText: '门店',
+    navigationBarTitleText: '我的消费',
     enablePullDownRefresh: true,
   }
 
-  onReachBottom() {
-    console.log("bbbbb");
-  }
+
 
   componentWillReceiveProps(nextProps) {
     console.log(this.props, nextProps)
   }
 
   onPullDownRefresh() {
-  //  this.fetchData()
+
+     cacheResults = {
+      page: 0,
+      total: 0,
+      items: []
+    }
+    this.setState({
+      list:[],
+      total:-1,
+    },this.fetchData)
   }
 
   componentWillUnmount() {
   }
 
   componentDidShow() {
-
+    this.fetchData();
 
   }
 
   fetchData() {
-    wx.showLoading({title: "加载中"})
-    var databody = {
-      token: this.token,
-      device_token: this.device_token
+    if(this.state.total>-1&&this.state.list.length==this.state.total)
+    {
+      return
     }
-    request.post(set.home, databody).then((data) => {
+    wx.showLoading({title: "加载中",mask:true})
+    var databody={
+      // openid:this.props.wxuser.wxuser.openid,
+      openid:"o1MBZ5JMtqvchLsGg6ViQuB1OvYM",
+      page:cacheResults.page
+    }
+    this.wx_request(set.oto.otoorderlist, databody,"POST", {'Content-Type': 'application/x-www-form-urlencoded'}).then((data)=>
+    {
+      console.log(data.data.data)
+      cacheResults.items=cacheResults.items.concat(data.data.data.list);
+      cacheResults.total=data.data.data.total;
+      console.log(cacheResults)
       this.setState({
-        pagedata: data.data
-      })
-      this.props.dispatch(set_goodslist(data.data.goods))
-      if (data.data.user) {
-        this.props.dispatch(set_userinfo(data.data.user));
-      }
-      if (data.data.vip) {
-        this.props.dispatch(set_viplist(data.data.vip))
-      }
-      this.props.dispatch(set_cart_num(data.data.cart_num))
-      this.props.dispatch(set_pushdatanum(data.data.pushnum));
-      this.props.dispatch(set_bind_car_num(data.data.max_bind_car_num))
-
-      this.setState({
-        offers_goods: data.data.offers_goods
+        list:cacheResults.items,
+        total:cacheResults.total
       })
 
+
+
+      wx.stopPullDownRefresh();
       wx.hideLoading();
-      this.props.dispatch(set_progress(this.props.progress.progress + 1))
-    }).catch((err) => {
+
+    }).catch((err)=>{
       wx.hideLoading();
+      wx.stopPullDownRefresh();
       wx.showToast({
         title: '网络访问失败，请重试',
         icon: 'none',
-        duration: 2000
+        duration: 1800
       })
     })
 
+  }
+  todetail(item)
+  {
+    Taro.navigateTo({url:"/pages/my/otodetail?id="+item.id})
+  }
+  tocomment(item)
+  {
+    Taro.navigateTo({url:"/pages/my/comment?order="+JSON.stringify(item)})
   }
   back()
   {
@@ -87,10 +109,14 @@ class Otoorder extends Component {
   }
   componentDidHide() {
   }
-
+  onReachBottom() {
+    cacheResults.page++;
+    this.fetchData();
+  }
   render() {
+    let {list,total}=this.state;
     return (
-      <View style={{backgroundColor:"#f0f2f5",height:"100vh"}}>
+      <View style={{backgroundColor:"#f0f2f5",height:"100vh",paddingTop:"105rpx"}}>
         <View style={{backgroundColor:"#ffffff"}}>
         <View
           style={{
@@ -100,7 +126,7 @@ class Otoorder extends Component {
           justifyContent: "center",
           alignItems: "flex-end",
           paddingBottom: "10rpx",
-          position:"relative",
+          position:"fixed",
           top:"0rpx",
           left:"0rpx",
           right:"0rpx",
@@ -116,139 +142,55 @@ class Otoorder extends Component {
             {/*<Image src={require("../../assets/images/left.png")} style={{width:"50rpx",height:"50rpx"}}/>*/}
           </View>
         </View>
-        <ScrollView >
-          <View style={{borderBottom:"10rpx solid #f0f2f5"}}>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <Text style={{flex:1,color:"#999999",fontSize:"26rpx"}}>
-                订单号:201812311406108745
-              </Text>
-              <Text style={{width:"100rpx",color:"#cc0033",fontSize:"26rpx",textAlign:"right"}}>
-                己完成
-              </Text>
-
-            </View>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <View style={{width:"180rpx",height:"180rpx",backgroundColor:"#eeeeee"}}>
+        <ScrollView>
+          {list&&list.length>0&&list.map((item,i)=>{
+            return(<View  key={i} style={{borderBottom:"10rpx solid #f0f2f5"}}>
+              <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
+                <Text style={{flex:1,color:"#999999",fontSize:"26rpx"}}>
+                  订单号:{item.sn}
+                </Text>
+                <Text style={{width:"100rpx",color:"#cc0033",fontSize:"26rpx",textAlign:"right"}}>
+                  {item.status_title}
+                </Text>
 
               </View>
-              <View style={{flex:1,display:"flex",justifyContent:"center",flexDirection:"column",paddingLeft:"20rpx"}}>
-                <Text style={{fontSize:"26rpx",color:"#333333"}}>湘UL7075在民营小区中石化店下单洗车项目</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>含服务:1</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>下单时间:2018-12-31 14:16</Text>
-              </View>
-              <View style={{display:"flex",alignItems:"center",justifyContent:"center",width:"150rpx",flexDirection:"column"}}>
-                <Text style={{fontSize:"30rpx",textDecoration:"line-through",color:"#666666"}}>￥12.00</Text>
-                <Text style={{fontSize:"30rpx",color:"#cc0033"}}>￥11.00</Text>
-              </View>
+              <View onClick={this.todetail.bind(this,item)} style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
+                <View style={{width:"180rpx",height:"180rpx"}}>
+                  <Image src={set.server_up+item.photo} style={{width:"180rpx",height:"180rpx"}}/>
 
-
-            </View>
-            <View style={{padding:"15rpx",display:"flex",justifyContent:"flex-end"}}>
-              <View style={{width:"180rpx",display:"flex",alignItems:"center",justifyContent:"center",height:"60rpx",backgroundColor:"#cc0033",borderRadius:"5rpx"}}>
+                </View>
+                <View style={{flex:1,display:"flex",justifyContent:"center",flexDirection:"column",paddingLeft:"20rpx"}}>
+                  <Text style={{fontSize:"26rpx",color:"#333333"}}>{item.plate}在{item.store_name}下单{item.order_type_title}</Text>
+                  <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>含服务:{item.service_num}</Text>
+                  <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>下单时间:{item.add_time}</Text>
+                </View>
+                {item.show_total!=item.total?<View style={{display:"flex",alignItems:"center",justifyContent:"center",width:"150rpx",flexDirection:"column"}}>
+                  <Text style={{fontSize:"30rpx",textDecoration:"line-through",color:"#666666"}}>￥{item.total}</Text>
+                  <Text style={{fontSize:"30rpx",color:"#cc0033"}}>￥{item.show_total}</Text>
+                </View>:
+                <View style={{display:"flex",alignItems:"center",justifyContent:"center",width:"150rpx",flexDirection:"column"}}>
+                  <Text style={{fontSize:"30rpx",color:"#666666"}}>￥{item.total}</Text>
+                </View>}
+              </View>
+              <View style={{padding:"15rpx",display:"flex",justifyContent:"flex-end"}}>
+                {item.pay_status==0&&<View style={{width:"180rpx",display:"flex",alignItems:"center",justifyContent:"center",height:"60rpx",backgroundColor:"#cc0033",borderRadius:"5rpx"}}>
+                  <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即付款</Text>
+                </View>}
+                {item.pay_status==1&&item.status<3&&<View onClick={this.tocomment.bind(this,item)} style={{width:"180rpx",display:"flex",alignItems:"center",justifyContent:"center",height:"60rpx",backgroundColor:"#cc0033",borderRadius:"5rpx",marginLeft:"10rpx"}}>
                   <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即评价</Text>
+                </View>}
               </View>
+            </View>)
+          })}
+          {total>-1&&list.length==total&&<View style={{height:"60rpx",width:"100%",alignItems:"center",justifyContent:"center",display:"flex"}}>
+            <Text style={{color:"#999999",fontSize:"26rpx"}}>
+              没有更多了
+            </Text>
 
-            </View>
-          </View>
-          <View style={{borderBottom:"10rpx solid #f0f2f5"}}>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <Text style={{flex:1,color:"#999999",fontSize:"26rpx"}}>
-                订单号:201812311406108745
-              </Text>
-              <Text style={{width:"100rpx",color:"#cc0033",fontSize:"26rpx",textAlign:"right"}}>
-                己完成
-              </Text>
-
-            </View>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <View style={{width:"180rpx",height:"180rpx",backgroundColor:"#eeeeee"}}>
-
-              </View>
-              <View style={{flex:1,display:"flex",justifyContent:"center",flexDirection:"column",paddingLeft:"20rpx"}}>
-                <Text style={{fontSize:"26rpx",color:"#333333"}}>湘UL7075在民营小区中石化店下单洗车项目</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>含服务:1</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>下单时间:2018-12-31 14:16</Text>
-              </View>
-              <View style={{display:"flex",alignItems:"center",justifyContent:"center",width:"150rpx",flexDirection:"column"}}>
-                <Text style={{fontSize:"30rpx",textDecoration:"line-through",color:"#666666"}}>￥12.00</Text>
-                <Text style={{fontSize:"30rpx",color:"#cc0033"}}>￥11.00</Text>
-              </View>
+          </View>}
 
 
-            </View>
-            <View style={{padding:"15rpx",display:"flex",justifyContent:"flex-end"}}>
-              <View style={{width:"180rpx",display:"flex",alignItems:"center",justifyContent:"center",height:"60rpx",backgroundColor:"#cc0033",borderRadius:"5rpx"}}>
-                <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即评价</Text>
-              </View>
 
-            </View>
-          </View>
-          <View style={{borderBottom:"10rpx solid #f0f2f5"}}>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <Text style={{flex:1,color:"#999999",fontSize:"26rpx"}}>
-                订单号:201812311406108745
-              </Text>
-              <Text style={{width:"100rpx",color:"#cc0033",fontSize:"26rpx",textAlign:"right"}}>
-                己完成
-              </Text>
-
-            </View>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <View style={{width:"180rpx",height:"180rpx",backgroundColor:"#eeeeee"}}>
-
-              </View>
-              <View style={{flex:1,display:"flex",justifyContent:"center",flexDirection:"column",paddingLeft:"20rpx"}}>
-                <Text style={{fontSize:"26rpx",color:"#333333"}}>湘UL7075在民营小区中石化店下单洗车项目</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>含服务:1</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>下单时间:2018-12-31 14:16</Text>
-              </View>
-              <View style={{display:"flex",alignItems:"center",justifyContent:"center",width:"150rpx",flexDirection:"column"}}>
-                <Text style={{fontSize:"30rpx",textDecoration:"line-through",color:"#666666"}}>￥12.00</Text>
-                <Text style={{fontSize:"30rpx",color:"#cc0033"}}>￥11.00</Text>
-              </View>
-
-
-            </View>
-            <View style={{padding:"15rpx",display:"flex",justifyContent:"flex-end"}}>
-              <View style={{width:"180rpx",display:"flex",alignItems:"center",justifyContent:"center",height:"60rpx",backgroundColor:"#cc0033",borderRadius:"5rpx"}}>
-                <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即评价</Text>
-              </View>
-
-            </View>
-          </View>
-          <View style={{borderBottom:"10rpx solid #f0f2f5"}}>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <Text style={{flex:1,color:"#999999",fontSize:"26rpx"}}>
-                订单号:201812311406108745
-              </Text>
-              <Text style={{width:"100rpx",color:"#cc0033",fontSize:"26rpx",textAlign:"right"}}>
-                己完成
-              </Text>
-
-            </View>
-            <View style={{borderBottom:"1rpx solid #f0f2f5",padding:"15rpx",display:"flex"}}>
-              <View style={{width:"180rpx",height:"180rpx",backgroundColor:"#eeeeee"}}>
-
-              </View>
-              <View style={{flex:1,display:"flex",justifyContent:"center",flexDirection:"column",paddingLeft:"20rpx"}}>
-                <Text style={{fontSize:"26rpx",color:"#333333"}}>湘UL7075在民营小区中石化店下单洗车项目</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>含服务:1</Text>
-                <Text style={{fontSize:"26rpx",color:"#999999",marginTop:"5rpx"}}>下单时间:2018-12-31 14:16</Text>
-              </View>
-              <View style={{display:"flex",alignItems:"center",justifyContent:"center",width:"150rpx",flexDirection:"column"}}>
-                <Text style={{fontSize:"30rpx",textDecoration:"line-through",color:"#666666"}}>￥12.00</Text>
-                <Text style={{fontSize:"30rpx",color:"#cc0033"}}>￥11.00</Text>
-              </View>
-
-
-            </View>
-            <View style={{padding:"15rpx",display:"flex",justifyContent:"flex-end"}}>
-              <View style={{width:"180rpx",display:"flex",alignItems:"center",justifyContent:"center",height:"60rpx",backgroundColor:"#cc0033",borderRadius:"5rpx"}}>
-                <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即评价</Text>
-              </View>
-
-            </View>
-          </View>
 
 
 

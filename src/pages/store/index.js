@@ -103,7 +103,7 @@ class Index extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{paddingTop:"105rpx"}}>
         <View style={{
           backgroundColor: "#cc0033",
           height: "105rpx",
@@ -111,7 +111,7 @@ class Index extends Component {
           justifyContent: "center",
           alignItems: "flex-end",
           paddingBottom: "10rpx",
-          position:"relative",
+          position:"fixed",
           top:"0rpx",
           left:"0rpx",
           right:"0rpx",

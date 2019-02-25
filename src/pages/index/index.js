@@ -26,7 +26,7 @@ class Index extends Component {
     navigationBarTitleText: '亨亨养车',
     enablePullDownRefresh: true,
     navigationBarBackgroundColor: "#cc0033",
-    navigationBarTextStyle: {color: "#ffffff", fontWeight: "bold"}
+    // navigationBarTextStyle: {color: "#ffffff", fontWeight: "bold"}
 
   }
 
@@ -39,7 +39,9 @@ class Index extends Component {
   }
 
   onPullDownRefresh() {
-    // this.fetchData()
+    this.getwxuser().then((res) => {
+      this.fetchData()
+    });
   }
 
   componentWillUnmount() {
@@ -62,7 +64,7 @@ class Index extends Component {
   }
 
   componentDidShow() {
-    this.getwxuser().then((res) => {
+    this.checkwxuser().then((res) => {
       this.fetchData()
     });
   }
@@ -70,23 +72,19 @@ class Index extends Component {
   fetchData() {
     wx.showLoading({title: "加载中..."})
     var databody = {
-      device_token: this.props.wxuser.wxuser.openid
+      openid: this.props.wxuser.wxuser.openid
     }
-    this.wx_request(set.home, databody, "POST").then((res) => {
+    this.wx_request(set.home, databody, "POST", {'Content-Type': 'application/x-www-form-urlencoded'}).then((res) => {
+      console.log(res)
       this.setState({
         sild: res.data.data.sild
       })
       this.props.dispatch(set_viplist(res.data.data.vip))
+      this.props.dispatch(set_userinfo(res.data.data.user))
       wx.hideLoading();
+      wx.stopPullDownRefresh()
     })
-
-
   }
-
-  test() {
-    console.log(this.props.vip.viplist)
-  }
-
   onPageScroll(e) {
     this.setState({
       title_opac: e.scrollTop / 100 > 1 ? 1 : e.scrollTop / 100
@@ -94,8 +92,6 @@ class Index extends Component {
       console.log(this.state.title_opac)
     })
   }
-
-
   tootoorder() {
     Taro.navigateTo({url: "/pages/my/otoorder"})
   }
@@ -105,7 +101,7 @@ class Index extends Component {
   }
 
   toWallet() {
-    this.checkLogin.then(()=>{
+    this.checkLogin().then(()=>{
       Taro.navigateTo({url: "/pages/my/wallet"})
     }).catch(()=>{
       Taro.navigateTo({url: "/pages/my/login"})
@@ -142,6 +138,14 @@ class Index extends Component {
   tovipdetail(id)
   {
     Taro.navigateTo({url:"/pages/index/vip?id="+id})
+  }
+  tomycar()
+  {
+    Taro.navigateTo({url:"/pages/my/MyCar"})
+  }
+  toconvert()
+  {
+    Taro.navigateTo({url:"/pages/index/ConverCard"})
   }
   render() {
     return (
@@ -185,14 +189,13 @@ class Index extends Component {
                   </SwiperItem>)
                 })
               }
-
             </Swiper>
           </View>
           {/***用户信息***/}
           <View style={{
             height: "80rpx",
             padding: "0rpx 10rpx 0rpx 10rpx",
-            backgroundImage: `url('../../assets/images/carbk.png')`,
+            backgroundImage: `url("http://app.jzdzsw.cn/backend/web/wxbackimage/carbk.png")`,
             backgroundSize: "cover",
             display: "flex",
             alignItems: "center",
@@ -203,7 +206,7 @@ class Index extends Component {
               {this.props.userinfo.userinfo?<View style={{height: "100%", display: "flex", alignItems: "center", flex: 1,justifyContent:"space-between"}}>
                 <View style={{height: "100%", display: "flex", alignItems: "center",flex:1}}>
                 <Image
-                  src={this.props.userinfo && this.props.userinfo.userinfo ? this.props.wxuser.wxuser.avatarUrl : require("../../assets/images/avatar.png")}
+                  src={this.props.userinfo && this.props.userinfo.userinfo ? this.props.userinfo.userinfo.wx_head_pic : require("../../assets/images/avatar.png")}
                   style={{
                     width: "50rpx",
                     marginLeft: "20rpx",
@@ -211,12 +214,12 @@ class Index extends Component {
                     borderRadius: "25rpx"
                   }}/>
                 <Text style={{fontSize: "26rpx", marginLeft: "20rpx", color: "#666666"}}>
-                  {this.props.userinfo && this.props.userinfo.userinfo && this.props.wxuser.wxuser.nickName}
+                  {this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.wx_nickname}
                 </Text>
                 </View>
-                <View style={{height: "100%", display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
+                  {this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.car?<View onClick={this.tomycar.bind(this)} style={{height: "100%", display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
                   <Image
-                    src={this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.car ? set.upurl + this.props.userinfo.userinfo.car.logo : require("../../assets/images/avatar.png")}
+                    src={this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.car ? set.upurl + this.props.userinfo.userinfo.car.logo : require("../../assets/images/ic_launcher.png")}
                     style={{
                       width: "50rpx",
                       marginLeft: "20rpx",
@@ -226,7 +229,12 @@ class Index extends Component {
                   <Text style={{fontSize: "26rpx", fontWeight: "bold", marginLeft: "20rpx", color: "#666666"}}>
                     {this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.car.car_plate}
                   </Text>
-                </View>
+                </View>:
+                <View  onClick={this.tomycar.bind(this)}  style={{height: "100%", display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
+                  <View style={{height:"45rpx",display:"flex",alignItems:"center",justifyContent:"center",background:"#cc0033",width:"120rpx",borderRadius:"8rpx"}}>
+                    <Text style={{fontSize:"22rpx",color:"#ffffff"}}>绑定车辆</Text>
+                  </View>
+                </View>}
               </View>:
                 <View style={{height: "100%", display: "flex", alignItems: "center",flex:1,marginLeft:"20rpx"}}>
                   <View style={{height:"60rpx"}}>
@@ -239,7 +247,7 @@ class Index extends Component {
 
           </View>
           <View style={{padding: "20rpx 0rpx 20rpx 0rpx", display: "flex", height: "150rpx"}}>
-            <View onClick={this.test.bind(this)} style={{
+            <View onClick={this.toconvert.bind(this)} style={{
               flex: 1,
               borderRight: "solid 1px #f0f2f5",
               display: "flex",
@@ -278,7 +286,7 @@ class Index extends Component {
 
 
               <Text style={{fontSize: "20rpx", color: "#999999", height: "20rpx"}}>
-                0元
+                {this.props.userinfo.userinfo&&this.props.userinfo.userinfo.user_money?this.props.userinfo.userinfo.user_money:0.00}元
               </Text>
 
 
@@ -299,7 +307,7 @@ class Index extends Component {
                 我的洗车卡
               </Text>
               <Text style={{fontSize: "20rpx", color: "#999999", height: "20rpx"}}>
-                0张
+                {this.props.userinfo.userinfo&&this.props.userinfo.userinfo.bag_count?this.props.userinfo.userinfo.bag_count:0}张
               </Text>
 
 
@@ -328,7 +336,7 @@ class Index extends Component {
           <View style={{
             height: "80rpx",
             padding: "0rpx 10rpx 0rpx 10rpx",
-            backgroundImage: `url(${require('../../assets/images/carbk.png')})`,
+            backgroundImage: `url("http://app.jzdzsw.cn/backend/web/wxbackimage/carbk.png")`,
             backgroundSize: "cover",
             display: "flex",
             alignItems: "center",

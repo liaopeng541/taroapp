@@ -90,7 +90,7 @@ class Carduse extends Component {
 
   render() {
     return (
-      <View style={{backgroundColor:"#f0f2f5",height:"100vh"}}>
+      <View style={{backgroundColor:"#f0f2f5",height:"100vh",paddingTop:"105rpx"}}>
         <View style={{backgroundColor:"#ffffff"}}>
         <View style={{
           backgroundColor: "#cc0033",
@@ -99,7 +99,7 @@ class Carduse extends Component {
           justifyContent: "center",
           alignItems: "flex-end",
           paddingBottom: "10rpx",
-          position:"relative",
+          position:"fixed",
           top:"0rpx",
           left:"0rpx",
           right:"0rpx",

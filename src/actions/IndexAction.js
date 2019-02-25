@@ -20,3 +20,6 @@ export const set_progress=(progress)=>{return{type:"set_progress",progress:progr
 export const set_pushdata=(pushdata)=>{return{type:"set_pushdata",pushdata:pushdata}}
 export const set_pushdatanum=(pushdatanum)=>{return{type:"set_pushdatanum",pushdatanum:pushdatanum}}
 export const gohome_btn=(status)=>{return{type:"gohome_btn",status:status}}
+
+export const get_editcar=()=>{return{type:"get_editcar"}}
+export const set_editcar=(editcar)=>{return{type:"set_editcar",editcar:editcar}}

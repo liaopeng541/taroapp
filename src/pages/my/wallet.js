@@ -107,7 +107,7 @@ class Wallet extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{paddingTop:"105rpx"}}>
         <View>
         <View style={{
           backgroundColor: "#cc0033",
@@ -116,7 +116,7 @@ class Wallet extends Component {
           justifyContent: "center",
           alignItems: "flex-end",
           paddingBottom: "10rpx",
-          position:"relative",
+          position:"fixed",
           top:"0rpx",
           left:"0rpx",
           right:"0rpx",
@@ -148,7 +148,9 @@ class Wallet extends Component {
 
             </View>
             <View style={{width:"200rpx",height:"120rpx",alignItems:"center",justifyContent:"center",display:"flex",paddingRight:"10rpx"}}>
-              <View style={{height:"50rpx",width:"200rpx",borderRadius:"25rpx",alignItems:"center",justifyContent:"center",display:"flex",marginRight:"10rpx"}}><Text style={{fontSize:"30rpx",color:"#cc0033",fontWeight:"bold"}}>￥183.00</Text></View>
+              <View style={{height:"50rpx",width:"200rpx",borderRadius:"25rpx",alignItems:"center",justifyContent:"center",display:"flex",marginRight:"10rpx"}}><Text style={{fontSize:"30rpx",color:"#cc0033",fontWeight:"bold"}}>
+                ￥{this.props.userinfo&&this.props.userinfo.userinfo&&this.props.userinfo.userinfo.user_money?this.props.userinfo.userinfo.user_money:0.00}
+              </Text></View>
             </View>
 
 
@@ -173,13 +175,13 @@ class Wallet extends Component {
               <Image src={require("../../assets/images/right.png")} style={{width: "40rpx", height: "40rpx"}}/>
             </View>
           </View>
-          <View style={{display:"flex",alignItems:"center",height:"130rpx",borderBottom:"solid 2rpx #f0f2f5",justifyContent:"space-between"}}>
+          <View  onClick={this.totransfer.bind(this)} style={{display:"flex",alignItems:"center",height:"130rpx",borderBottom:"solid 2rpx #f0f2f5",justifyContent:"space-between"}}>
             <View style={{width:"140rpx",height:"130rpx",alignItems:"center",justifyContent:"center",display:"flex"}}>
               <View style={{display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"40rpx",height:"80rpx",width:"80rpx",backgroundColor:"#6890ff"}}>
                 <Image src={require("../../assets/images/washcard.png")} style={{width: "40rpx", height: "40rpx"}}/>
               </View>
             </View>
-            <View onClick={this.totransfer.bind(this)}  style={{flex:1}}>
+            <View  style={{flex:1}}>
               <Text style={{display:"block",color:"#333333",fontSize:"26rpx",fontWeight:"bold"}}>
                 转账
               </Text>
@@ -192,13 +194,13 @@ class Wallet extends Component {
               <Image src={require("../../assets/images/right.png")} style={{width: "40rpx", height: "40rpx"}}/>
             </View>
           </View>
-          <View style={{display:"flex",alignItems:"center",height:"130rpx",borderBottom:"solid 2rpx #f0f2f5",justifyContent:"space-between"}}>
+          <View onClick={this.toaccount.bind(this)} style={{display:"flex",alignItems:"center",height:"130rpx",borderBottom:"solid 2rpx #f0f2f5",justifyContent:"space-between"}}>
             <View style={{width:"140rpx",height:"130rpx",alignItems:"center",justifyContent:"center",display:"flex"}}>
               <View style={{display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"40rpx",height:"80rpx",width:"80rpx",backgroundColor:"#6890ff"}}>
                 <Image src={require("../../assets/images/washcard.png")} style={{width: "40rpx", height: "40rpx"}}/>
               </View>
             </View>
-            <View onClick={this.toaccount.bind(this)} style={{flex:1}}>
+            <View  style={{flex:1}}>
               <Text style={{display:"block",color:"#333333",fontSize:"26rpx",fontWeight:"bold"}}>
                 交易记录
               </Text>
@@ -211,10 +213,6 @@ class Wallet extends Component {
               <Image src={require("../../assets/images/right.png")} style={{width: "40rpx", height: "40rpx"}}/>
             </View>
           </View>
-
-
-
-
         </ScrollView>
         </View>
       </View>
@@ -224,7 +222,7 @@ class Wallet extends Component {
 
 const mapstate = state => {
   return {
-    data: state.usermodel,
+    userinfo: state.usermodel,
     cart_num: state.cart_num,
     cart: state.cart,
     goodslist: state.goodslist,

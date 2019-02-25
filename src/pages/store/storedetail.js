@@ -15,9 +15,10 @@ class Storedetail extends Component {
     // base(this)
     super(props)
     this.state = {
-      store: null
+      store: []
     }
   }
+
 
   config = {
     navigationBarTitleText: '门店',
@@ -69,9 +70,20 @@ class Storedetail extends Component {
   componentDidHide() {
   }
 
+  // renderswiper()
+  // {
+  //     const { store }  = this.state;
+  //     store.thumbs.map((item, i) => {
+  //       return (<SwiperItem key={i}>
+  //         <Image src={set.upurl + item} style={{width: "100vw"}} mode="widthFix"></Image>
+  //       </SwiperItem>)
+  //     })
+  // }
+
   render() {
+    const { store }  = this.state;
     return (
-      <View style={{backgroundColor: "#f0f2f5", height: "100vh"}}>
+      <View style={{backgroundColor: "#f0f2f5", height: "100vh",paddingTop:"105rpx"}}>
         <View style={{backgroundColor: "#ffffff"}}>
           <View style={{
             backgroundColor: "#cc0033",
@@ -80,7 +92,7 @@ class Storedetail extends Component {
             justifyContent: "center",
             alignItems: "flex-end",
             paddingBottom: "10rpx",
-            position: "relative",
+            position: "fixed",
             top: "0rpx",
             left: "0rpx",
             right: "0rpx",
@@ -108,30 +120,30 @@ class Storedetail extends Component {
               <Swiper autoplay={true} circular={true} indicatorDots={true}
                       style={{background: "#ffffff", height: "58vw"}}>
                 {
-
-                  this.state.store && this.state.store.thumbs.map((item, i) => {
+                  store.thumbs&&store.thumbs.length>0&&store.thumbs.map((item, i) => {
                     return (<SwiperItem key={i}>
                       <Image src={set.upurl + item} style={{width: "100vw"}} mode="widthFix"></Image>
                     </SwiperItem>)
                   })
                 }
 
+
               </Swiper>
             </View>
             <View style={{padding: "20rpx"}}>
               <View>
                 <Text style={{fontSize: "26rpx", color: "#3333333"}}>
-                  店铺名称:sldkjflksdfjlk
+                  店铺名称:亨亨养车旗舰店
                 </Text>
               </View>
               <View>
                 <Text style={{fontSize: "26rpx", color: "#999999"}}>
-                  店铺名称:sldkjflksdfjlk
+                  简介:吉首乾州亨亨旗舰店
                 </Text>
               </View>
               <View>
                 <Text style={{fontSize: "26rpx", color: "#999999"}}>
-                  店铺名称:sldkjflksdfjlk
+                  电话:0743-8259888
                 </Text>
               </View>
               <View style={{display:"flex",flexWrap:"wrap",padding:"10rpx"}}>
@@ -145,7 +157,7 @@ class Storedetail extends Component {
                     padding: "5rpx 10rpx 5rpx 10rpx",
                     borderRadius: "5rpx"
                   }}>
-                  <Text style={{fontSize: "20rpx", color: "#cc0033"}}>1111</Text>
+                  <Text style={{fontSize: "20rpx", color: "#cc0033"}}>洗车</Text>
                 </View>
                 <View
                   style={{
@@ -157,12 +169,12 @@ class Storedetail extends Component {
                     padding: "5rpx 10rpx 5rpx 10rpx",
                     borderRadius: "5rpx"
                   }}>
-                  <Text style={{fontSize: "20rpx", color: "#cc0033"}}>1111</Text>
+                  <Text style={{fontSize: "20rpx", color: "#cc0033"}}>美容</Text>
                 </View>
               </View>
               <View style={{display: "flex", alignItems: "center", padding: "5rpx 10rpx 5rpx 10rpx"}}>
                 <Image src={require("../../assets/images/location.png")} style={{width: "32rpx", height: "32rpx"}}/>
-                <Text style={{color: "#999999", fontSize: "26rpx"}}>2222</Text>
+                <Text style={{color: "#999999", fontSize: "26rpx"}}>吉首市人民南路乾州州法院旁</Text>
               </View>
             </View>
             <View style={{height:"500rpx",width:"100%"}}>

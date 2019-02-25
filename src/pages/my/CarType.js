@@ -1,21 +1,23 @@
 import Taro, {Component} from '@tarojs/taro'
-import {View, Button, Text, Swiper, SwiperItem, Image, ScrollView,Input} from '@tarojs/components'
+import {View, Button, Text, Swiper, SwiperItem, Image, ScrollView} from '@tarojs/components'
 import {connect} from '@tarojs/redux'
 import {
   set_userinfo, set_cart, set_goodslist, set_viplist, set_bind_car_num, set_progress,
-  set_pushdata, set_pushdatanum, gohome_btn, set_cart_num,
+  set_pushdata, set_pushdatanum, gohome_btn, set_cart_num, set_editcar,
 } from '../../actions/IndexAction'
-// import base from "../base"
+ import base from "../base"
 import request from "../../libs/request"
 import './index.less'
 import set from "../../apis/api"
+import {editcar} from "../../reducers/IndexModel";
 
-class Vip extends Component {
+class CarType extends Component {
   constructor(props) {
-    // base(this)
+
     super(props)
+     base(this)
     this.state = {
-      vip:null
+      list: []
     }
   }
 
@@ -40,36 +42,52 @@ class Vip extends Component {
   }
 
   componentDidShow() {
-    this.props.vip.viplist && this.props.vip.viplist.map((item,i)=>{
-      if(item.level_id==this.$router.params.id)
-      {
-        console.log(item)
-        this.setState({
-          vip:item
-        })
-      }
+    this.fetchData();
+  }
+  setcar(car,e)
+  {
+    console.log(car)
+    this.props.dispatch(set_editcar(Object.assign({},this.props.editcar.editcar,{carname:car.carname,car_id:car.car_id})))
+    e.stopPropagation();
+    this.back();
+  }
+
+  fetchData() {
+    wx.showLoading({title: "加载中"})
+    var databody = {
+      id:this.props.editcar.editcar.series_id
+    }
+    console.log(databody)
+    this.wx_request(set.getcartype, databody,"POST",{'Content-Type': 'application/x-www-form-urlencoded'}).then((data) => {
+      console.log(data.data)
+      this.setState({
+        list:data.data
+      })
+
+
+      wx.hideLoading();
+    }).catch((err) => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '网络访问失败，请重试',
+        icon: 'none',
+        duration: 2000
+      })
     })
 
   }
 
-  torecharge()
-  {
-    console.log(this.state.vip)
-    Taro.navigateTo({url:"/pages/my/subrecharge?money="+this.state.vip.amount})
+  componentDidHide() {
   }
-
-
   back()
   {
     Taro.navigateBack()
   }
-  componentDidHide() {
-  }
   render() {
-    const {vip} = this.state;
+    const {list}=this.state;
     return (
-      <View style={{backgroundColor:"#f0f2f5",height:"100vh",paddingTop:"105rpx"}}>
-        <View style={{backgroundColor:"#ffffff"}}>
+      <View style={{paddingTop:"105rpx"}}>
+        <View>
         <View style={{
           backgroundColor: "#cc0033",
           height: "105rpx",
@@ -87,33 +105,25 @@ class Vip extends Component {
             <Image src={require("../../assets/images/left.png")} style={{width:"50rpx",height:"50rpx"}}/>
           </View>
           <View style={{flex:1,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
-          <Text style={{color: "#ffffff", fontSize: "36rpx",fontWeight:"bold"}}>{this.state.vip.level_name}</Text>
+          <Text style={{color: "#ffffff", fontSize: "36rpx",fontWeight:"boldß"}}>选择车型</Text>
           </View>
           <View style={{height:"80rpx",width:"70rpx",display:"flex",alignItems:"flex-end"}}>
             {/*<Image src={require("../../assets/images/left.png")} style={{width:"50rpx",height:"50rpx"}}/>*/}
           </View>
         </View>
-        <ScrollView >
-
-          {
-            vip&&vip.detail_img.map((item,i)=>{
-                return(<Image key={i} src={set.upurl+item} mode="widthFix" style={{width:"100%"}}/>)
-              })
-          }
-
+        <ScrollView>
+          {list&&list.length>0&&list.map((item,i)=>{
+            return(<View key={i} onClick={this.setcar.bind(this,item)}  style={{borderBottom:"solid 1rpx #f0f2f5",display:"flex",alignItems:"center",paddingLeft:"30rpx",height:"80rpx",width:"100%"}}>
+              <Text style={{fontSize:"26rpx",color:"#666666"}}>{item.carname}</Text>
+            </View>)
+          })}
 
 
-
-
-          
 
 
 
 
         </ScrollView>
-          <View onClick={this.torecharge.bind(this)} style={{position:"fixed",bottom:0,left:0,right:0,height:"90rpx",backgroundColor:"#cc0033",zIndex:99,alignItems:"center",justifyContent:"center",display:"flex"}}>
-            <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即充值</Text>
-          </View>
         </View>
       </View>
     )
@@ -128,8 +138,9 @@ const mapstate = state => {
     goodslist: state.goodslist,
     vip: state.vip,
     progress: state.progress,
-    pushdata: state.pushdata
+    pushdata: state.pushdata,
+    editcar:state.editcar
   }
 }
-export default connect(mapstate)(Vip)
+export default connect(mapstate)(CarType)
 

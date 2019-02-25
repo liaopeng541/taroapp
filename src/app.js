@@ -25,12 +25,16 @@ class App extends Component {
     pages: [
       'pages/index/index',
       'pages/index/vip',
+      'pages/index/ConverCard',
+      'pages/index/SubConverCard',
       'pages/index/workerdetail',
+      'pages/index/ConverCardSuccess',
       'pages/store/index',
       'pages/store/storedetail',
       'pages/my/index',
       'pages/my/wallet',
       'pages/my/recharge',
+      'pages/my/subrecharge',
       'pages/my/account',
       'pages/my/transfer',
       'pages/my/washcard',
@@ -39,14 +43,22 @@ class App extends Component {
       'pages/my/otoorder',
       'pages/my/otodetail',
       'pages/my/comment',
-      'pages/my/login'
+      'pages/my/login',
+      'pages/my/EditCar',
+      'pages/my/CarBrand',
+      'pages/my/CarType',
+      'pages/my/Letter',
+      'pages/my/Province',
+      'pages/my/MyCar',
+      'pages/common/webview',
+
     ],
     window: {
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black',
       backgroundColor:"#fff",
-      backgroundTextStyle:"drak",
+      backgroundTextStyle:"dark",
       navigationStyle:"custom"
     },
     tabBar: {

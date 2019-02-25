@@ -32,7 +32,7 @@ class Login extends Component {
     navigationBarTitleText: '亨亨养车',
     enablePullDownRefresh: true,
     navigationBarBackgroundColor: "#cc0033",
-    navigationBarTextStyle: {color: "#ffffff", fontWeight: "bold"}
+    // navigationBarTextStyle: {color: "#ffffff", fontWeight: "bold"}
 
   }
 
@@ -311,7 +311,7 @@ class Login extends Component {
 
   render() {
     return (
-      <View style={{backgroundColor: "#ffffff", height: "100vh"}}>
+      <View style={{backgroundColor: "#ffffff", height: "100vh",paddingTop:"105rpx"}}>
         <View style={{backgroundColor: "#ffffff"}}>
           <View
             style={{
@@ -321,7 +321,7 @@ class Login extends Component {
               justifyContent: "center",
               alignItems: "flex-end",
               paddingBottom: "10rpx",
-              position: "relative",
+              position: "fixed",
               top: "0rpx",
               left: "0rpx",
               right: "0rpx",

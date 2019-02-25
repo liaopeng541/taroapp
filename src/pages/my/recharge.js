@@ -24,6 +24,7 @@ class Recharge extends Component {
         {money: 2999, checked: false},
 
       ],
+      money:99,
     }
   }
 
@@ -54,13 +55,35 @@ class Recharge extends Component {
 
 
   }
+  tosubrecharge()
+  {
+    if(this.state.money>0)
+    {
+      Taro.navigateTo({url:"/pages/my/subrecharge?money="+this.state.money})
+    }else {
+      wx.showToast({title:"请选择或输入充值金额",icon:"none"})
+    }
+  }
+  setmoney(item)
+  {
+    console.log(item)
+    this.setState({
+      money:item
+    })
 
+  }
+  setmoneyforinput(e)
+  {
+    this.setState({
+      money:e.detail.value
+    })
+  }
   componentDidHide() {
   }
 
   render() {
     return (
-      <View style={{backgroundColor:"#f0f2f5",height:"100vh"}}>
+      <View style={{backgroundColor:"#f0f2f5",height:"100vh",paddingTop:"105rpx"}}>
         <View style={{backgroundColor:"#ffffff"}}>
         <View style={{
           backgroundColor: "#cc0033",
@@ -69,7 +92,7 @@ class Recharge extends Component {
           justifyContent: "center",
           alignItems: "flex-end",
           paddingBottom: "10rpx",
-          position:"relative",
+          position:"fixed",
           top:"0rpx",
           left:"0rpx",
           right:"0rpx",
@@ -87,11 +110,11 @@ class Recharge extends Component {
         </View>
         <ScrollView >
           <View style={{padding:"20rpx",borderBottom:"10rpx solid #f0f2f5",display:"flex"}}>
-            <View style={{flex:1,padding:"10rpx",display:"flex"}}>
-              <Image src="https://wx.qlogo.cn/mmopen/vi_32/13fqPkeaUSMx4Eyu7jPT9FUJdYIXznX5Wg56S2rPZ6bFcdKfnjA4iafu1UzIUKXRI6H0bFOPPe0aiaLaGZuOT2Dw/132" style={{width:"60rpx",height:"60rpx",borderRadius:"25rpx"}}/>
+            <View style={{flex:1,padding:"10rpx",display:"flex",alignItems:"center"}}>
+              <Image src={this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.wx_head_pic? this.props.userinfo.userinfo.wx_head_pic:require("../../assets/images/avatar.png")} style={{width:"60rpx",height:"60rpx",borderRadius:"25rpx"}}/>
               <View style={{flex:1,marginLeft:"20rpx"}}>
                 <Text style={{display:"block",color:"#333333",fontSize:"26rpx"}}>
-                  1597***2691
+                  {this.props.userinfo && this.props.userinfo.userinfo && this.props.userinfo.userinfo.wx_nickname?this.props.userinfo.userinfo.wx_nickname:""}
                 </Text>
                 <Text style={{display:"block",color:"#999999",fontSize:"20rpx"}}>
 
@@ -100,8 +123,8 @@ class Recharge extends Component {
             </View>
             <View style={{flex:1,padding:"10rpx",display:"flex",alignItems:"center",justifyContent:"center"}}>
 
-                <Text style={{display:"block",color:"#333333",fontSize:"26rpx"}}>账户余额:</Text>
-              <Text style={{display:"block",color:"#cc0033",fontSize:"26rpx"}}>183.00</Text><Text style={{display:"block",color:"#333333",fontSize:"26rpx"}}>元</Text>
+              <Text style={{display:"block",color:"#333333",fontSize:"26rpx"}}>账户余额:</Text>
+              <Text style={{display:"block",color:"#cc0033",fontSize:"26rpx"}}>{this.props.userinfo&&this.props.userinfo.userinfo&&this.props.userinfo.userinfo.user_money?this.props.userinfo.userinfo.user_money:0.00}</Text><Text style={{display:"block",color:"#333333",fontSize:"26rpx"}}>元</Text>
 
 
             </View>
@@ -112,12 +135,12 @@ class Recharge extends Component {
           <View style={{padding:"20rpx",borderBottom:"10rpx solid #f0f2f5",display:"flex",flexDirection:"column"}}>
             <Text style={{fontSize:"26rpx",color:"#333333"}}>充值金额</Text>
               <View style={{margin:"20rpx",display:"flex",border:"2rpx solid #cccccc",height:"50rpx",borderRadius:"10rpx",padding:"10rpx 20rpx 10rpx 20rpx"}}>
-                <Input style={{flex:1,color:"#cc0033",textAlign:"center"}} type="digit"/>
+                <Input value={this.state.money} style={{flex:1,color:"#cc0033",textAlign:"center"}} type="digit" onInput={this.setmoneyforinput.bind(this)}/>
 
               </View>
             <View style={{display:"flex",flexWrap:"wrap"}}>
               {this.state.moneylist&&this.state.moneylist.map((item,i)=>{
-                return(<View key={i} style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
+                return(<View onClick={this.setmoney.bind(this,item.money)} key={i} style={{ border: "2rpx solid #dad2b2",height:"80rpx",width:"190rpx",borderRadius:"10rpx",display:"flex",alignItems:"center",justifyContent:"center",margin:"20rpx"}}>
                   <Text style={{color:"#cc0033",fontSize:"30rpx"}}>{item.money}元</Text>
                 </View>)
               })}
@@ -157,7 +180,7 @@ class Recharge extends Component {
 
         </ScrollView>
         </View>
-        <View style={{position:"fixed",bottom:0,left:0,right:0,height:"90rpx",backgroundColor:"#cc0033",zIndex:99,alignItems:"center",justifyContent:"center",display:"flex"}}>
+        <View onClick={this.tosubrecharge.bind(this)} style={{position:"fixed",bottom:0,left:0,right:0,height:"90rpx",backgroundColor:"#cc0033",zIndex:99,alignItems:"center",justifyContent:"center",display:"flex"}}>
           <Text style={{fontSize:"26rpx",color:"#ffffff"}}>立即充值</Text>
         </View>
       </View>
@@ -167,13 +190,14 @@ class Recharge extends Component {
 
 const mapstate = state => {
   return {
-    data: state.usermodel,
+    userinfo: state.usermodel,
     cart_num: state.cart_num,
     cart: state.cart,
     goodslist: state.goodslist,
     vip: state.vip,
     progress: state.progress,
-    pushdata: state.pushdata
+    pushdata: state.pushdata,
+    wxuser:state.wxusermodel
   }
 }
 export default connect(mapstate)(Recharge)

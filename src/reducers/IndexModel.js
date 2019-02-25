@@ -15,6 +15,13 @@ export const wxusermodel=(state={wxuser:null},action)=>{
     default:return state
   }
 }
+export const editcar=(state={editcar:{address:"湘",letter:"U",series:"选择品牌",carname:"选择车型"}},action)=>{
+  switch (action.type)
+  {
+    case "set_editcar":return {editcar:action.editcar};
+    default:return state
+  }
+}
 export const store=(state={store:null},action)=>{
   switch (action.type)
   {
